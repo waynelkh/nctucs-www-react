@@ -1,0 +1,21 @@
+{
+  "name": "demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "dependencies": {
+    "jsx-loader": "^0.13.1",
+    "material-ui": "^0.7.3",
+    "react": "^0.13.1",
+    "react-tap-event-plugin": "^0.1.6",
+    "style-loader": "^0.10.2",
+    "webpack": "^1.8.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "wnlee",
+  "license": "ISC"
+}
