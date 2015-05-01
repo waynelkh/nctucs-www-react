@@ -3,6 +3,8 @@ var $ = require('jquery');
 var request = require('superagent');
 var Header = require('./header.js');
 var List = require('./List.js');
+var Firebase = require('firebase');
+var ReactFireMixin = require('reactfire');
 
 var main = React.createClass({
 
@@ -10,35 +12,41 @@ var main = React.createClass({
         return {
             number: 0,
             like: true,
-            humun: []
+            humun: [],
+            items: [],
         };
     },
 
+    mixins: [ReactFireMixin],
+
     componentDidMount: function() {
+        this.bindAsArray(new Firebase("https://react-example.firebaseio.com/"), "items");
+
         //"http://filltext.com/?rows=20&name={firstName}&age={randomNumberRange|5to50}"
-        var url = "http://www.filltext.com/?callback=?";
-         $.getJSON( url, {
-           'rows': 20,
-           'name': '{firstName}',
-           'age': '{randomNumber}'
-         })
-         .done(function( data ) {
-            this.setState({
-                humun: data
-            });
-         }.bind(this));
+        // var url = "http://www.filltext.com/?callback=?";
+        //  $.getJSON( url, {
+        //    'rows': 20,
+        //    'name': '{firstName}',
+        //    'age': '{randomNumber}'
+        //  })
+        //  .done(function( data ) {
+        //     this.setState({
+        //         humun: data
+        //     });
+        //  }.bind(this));
     },
 
     handleClick: function(){
-        var url = "http://www.filltext.com/";
-        request
-            .get(url)
-            .query('rows=20&name={firstName}&age={randomNumber}')
-            .end(function(err, res){
-                this.setState({
-                    humun: JSON.parse(res.text)
-                });
-        }.bind(this));
+        console.log(this);
+        // var url = "http://www.filltext.com/";
+        // request
+        //     .get(url)
+        //     .query('rows=20&name={firstName}&age={randomNumber}')
+        //     .end(function(err, res){
+        //         this.setState({
+        //             humun: JSON.parse(res.text)
+        //         });
+        // }.bind(this));
 
         this.setState({
             number: this.state.number+1,
@@ -47,7 +55,7 @@ var main = React.createClass({
     },
 
     render: function() {
-        var isLike = this.state.like ? 'glyphicon glyphicon-heart' : '';
+        var isLike = this.state.like ? 'mdi-action-favorite' : 'mdi-action-favorite-outline';
         return (
             <div>
                 <Header />
@@ -55,7 +63,7 @@ var main = React.createClass({
                 <p>
                     Like or not: <spen className={isLike}></spen>
                 </p>
-                <button onClick={this.handleClick}>Push</button>
+                <button className="btn btn-primary" onClick={this.handleClick}>Push</button>
                 <List humun={this.state.humun} />
             </div>
         );
