@@ -29,5 +29,8 @@
   },
   "keywords": [],
   "author": "wnlee",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "webpack-notifier": "^1.2.1"
+  }
 }

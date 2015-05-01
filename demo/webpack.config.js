@@ -1,5 +1,6 @@
 var Path = require('path');
 var webpack =require('webpack');
+var WebpackNotifierPlugin = require('webpack-notifier');
 
 module.exports = {
     entry: [
@@ -35,6 +36,7 @@ module.exports = {
         ]
     },
     plugins: [
-        new webpack.NoErrorsPlugin()
+        new webpack.NoErrorsPlugin(),
+        new WebpackNotifierPlugin()
     ]
 };

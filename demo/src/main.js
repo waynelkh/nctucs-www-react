@@ -1,8 +1,6 @@
 var React = require('react');
 var $ = require('jquery');
-var request = require('superagent');
-var Header = require('./header.js');
-var List = require('./List.js');
+var MessageList = require('./MessageList.js');
 var Firebase = require('firebase');
 var ReactFireMixin = require('reactfire');
 
@@ -10,61 +8,85 @@ var main = React.createClass({
 
     getInitialState: function() {
         return {
-            number: 0,
-            like: true,
-            humun: [],
-            items: [],
+            messages: [],
+            user: {
+                name: '',
+                avator: ''
+            }
         };
     },
 
     mixins: [ReactFireMixin],
 
     componentDidMount: function() {
-        this.bindAsArray(new Firebase("https://react-example.firebaseio.com/"), "items");
+        this.bindAsArray(
+            new Firebase("https://react-example.firebaseio.com/messages").orderByKey(),
+            "messages");
 
-        //"http://filltext.com/?rows=20&name={firstName}&age={randomNumberRange|5to50}"
-        // var url = "http://www.filltext.com/?callback=?";
-        //  $.getJSON( url, {
-        //    'rows': 20,
-        //    'name': '{firstName}',
-        //    'age': '{randomNumber}'
-        //  })
-        //  .done(function( data ) {
-        //     this.setState({
-        //         humun: data
-        //     });
-        //  }.bind(this));
-    },
-
-    handleClick: function(){
-        console.log(this);
-        // var url = "http://www.filltext.com/";
-        // request
-        //     .get(url)
-        //     .query('rows=20&name={firstName}&age={randomNumber}')
-        //     .end(function(err, res){
-        //         this.setState({
-        //             humun: JSON.parse(res.text)
-        //         });
-        // }.bind(this));
-
-        this.setState({
-            number: this.state.number+1,
-            like: !this.state.like
+        $.ajax({
+          url: 'http://api.randomuser.me/',
+          dataType: 'json',
+          success: function(data){
+            this.setState({
+                user: {
+                    name: this.state.user.name,
+                    avator: data.results[0].user.picture.thumbnail
+                }
+            });
+          }.bind(this)
         });
     },
 
+    handleSubmit: function(e){
+        e.preventDefault();  // 防止瀏覽器原生form action
+
+        var username = this.state.user.name ?
+        this.state.user.name : this.refs.username.getDOMNode().value.trim();
+        var messageDOM = this.refs.message.getDOMNode();
+
+        if (messageDOM.value.trim() === ''){
+            messageDOM.focus();
+            return false;
+        }
+
+        this.firebaseRefs["messages"].push({
+            avator: this.state.user.avator,
+            username: username,
+            message: messageDOM.value.trim()
+        });
+
+        this.setState({
+            user: {
+                user: username,
+                avator: this.state.user.avator
+            }
+        });
+        messageDOM.value = '';
+    },
+
     render: function() {
-        var isLike = this.state.like ? 'mdi-action-favorite' : 'mdi-action-favorite-outline';
+
+        var imageA = <img src={this.state.user.avator} alt="Avator" />;
+
         return (
             <div>
-                <Header />
-                <p>Number: {this.state.number}</p>
-                <p>
-                    Like or not: <spen className={isLike}></spen>
-                </p>
-                <button className="btn btn-primary" onClick={this.handleClick}>Push</button>
-                <List humun={this.state.humun} />
+                <h2>Name: { this.state.user.name ? this.state.user.name : 'None'}</h2>
+                    {imageA}
+                <form className="form" onSubmit={this.handleSubmit}>
+                    <input className="form-control floating-label"
+                           type="text"
+                           placeholder="User name"
+                           ref='username' />
+
+                    <input className="form-control floating-label"
+                           type="text"
+                           placeholder="Say something..."
+                           ref='message' />
+
+                    <input type="submit" className="btn btn-primary" value="Send" />
+                </form>
+
+                <MessageList messages={this.state.messages} />
             </div>
         );
     }
